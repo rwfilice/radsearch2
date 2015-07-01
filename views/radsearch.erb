@@ -1,0 +1,294 @@
+<!-- Main Radsearch Form -->
+<div class="col-sm-12 radsearch-col">
+  <form id="radsearch-form" onsubmit="submitRadsearch(1);return false;">
+    <div class="col-sm-10 radsearch-col">
+      <input type="text" id="phrase" name="phrase" class="form-control" placeholder="Search Phrase" autofocus value="<%=@phrase%>"\>
+    </div>
+    <div class="col-sm-2 radsearch-col text-right">
+      <button class="btn btn-sm btn-primary" id="radsearch-button" type="submit">Go!</button>
+      <button class="btn btn-sm btn-warning" id="radsearch-advanced">Advanced Options</button>
+    </div>
+  </form>
+</div>
+
+<!-- Search statistics and Solr syntax link -->
+<div class="col-sm-9 radsearch-col">
+<% if @error %>
+   <div><%=@error%></div>
+<% elsif @solr %>
+   <div><%=@solr['response']['numFound']%> results found in <%=@solr['responseHeader']['QTime']%> ms</div>
+<% else %>
+   <div style="color: white">placeholder</div>
+<% end %>
+</div>
+<div class="col-sm-3 radsearch-col text-right">
+   <a href="http://www.solrtutorial.com/solr-query-syntax.html" target="_blank">Syntax Help</a>
+</div>
+
+<!-- Adjust depending on whether advanced form is displayed -->
+<% if @advancedVisible == 'true' %>
+  <div class="col-md-9" id="radsearch-main">
+<% else %>
+  <div class="col-md-12" id="radsearch-main">
+<% end %>
+
+<!-- Iterate through Solr results and display reports -->
+<% if @solr && !@error %>
+   <% @solr['response']['docs'].each do |result| %>
+     <div class="panel panel-default">
+       <div class="panel-heading">
+	 <table style="width:100%;"><tr>
+	 <td style="width:80%;vertical-align:top;">
+         <a class="search-link" data-toggle="collapse" data-parent="#accordion" href="#<%=result['id']%>">
+         <h3 class="panel-title" viewed="false" search-id="<%=@search_id%>" search-mrn="<%=result['patient_id']%>" search-acc="<%=result['accession_number']%>"><%="#{result['procedure_id']}:" if result['procedure_id']%><%=result['procedure_name']%> (<%=result['diag']%>)</h3>
+	 </a>
+	 </td>
+	 <td style="width:20%;text-align:right;vertical-align:top;">
+	   <%=Time.parse(result['timestamp']).localtime.strftime("%m-%d-%Y %H:%M")%>
+	 </tr></table>
+	 <table style="width:100%;"><tr>
+	 <td style="width:60%;vertical-align:top;"><%=result['patient_name']%>/<%=Date.parse(result['patient_dob']).strftime("%m-%d-%Y")%>/<%=result['patient_sex']%> MRN: <%=result['patient_id']%> Acc: <%=result['accession_number']%></td>
+	 <td style="width:40%;text-align:right;vertical-align:top;"><%=result['attending']%>/<%=result['assisting']%>  Referring: <%=result['requesting']%></td>
+	 </tr></table>
+       </div>
+
+
+       <% if @solr['highlighting'] %>
+         <div class="panel-heading">
+	   <div><%=@solr['highlighting'][result['id']]['report'].collect{|x| x.strip}.join(" . . . ")%></div>
+         </div>
+       <% end %>
+       <pre id="<%=result['id']%>" class="panel-collapse collapse" style="margin:0;border:0;white-space:pre-line;word-break:normal;"><%=result['report'].strip.gsub(/([^\n:]{1})((\.)\n(?![A-Z]{2})|\n(?![A-Z]{1}))(?!\n)(?![1-9]*\.\s+)/,"\\1\\3 ").gsub(/\n{3,}/,"\n\n")%></pre>
+     </div>
+   <% end %>
+<% end %>
+
+<!-- If there is pagination data, show it -->
+<div>
+<% if @pages %>
+  <div class="text-center">
+  <ul class="pagination">
+    <% @pages.each do |page| %>
+      <li class="<%=page[:css]%>"><a class="pglink <%=page[:css]%>" page="<%=page[:idx]%>" href="#"><%=page[:page]%></a></li>
+    <% end %>
+  </ul>
+  </div>
+<% end %>
+</div>
+</div>
+
+<!-- Advanced parameter form -->
+<% if @advancedVisible == 'true' %>
+  <div class="col-md-3 pull-right" id="radsearch-side">
+<% else %>
+  <div class="col-md-3 pull-right" id="radsearch-side" style="display:none">
+<% end %>
+
+<form>
+  <table class="table table-condensed">
+    <thead>
+      <tr><th colspan="2">Dates</th></tr>
+    </thead>
+    <tr>
+      <td><label for="rs-from">From</label></td>
+      <td><input type="text" id="rs-from" name="rs-from" value="<%=@lower%>"></td>
+    </tr>
+    <tr>
+      <td><label for="rs-to">To</label></td>
+      <td><input type="text" id="rs-to" name="rs-to" value="<%=@upper%>"></td>
+    </tr>
+    <thead>
+      <tr><th colspan="2">Patient Info</th></tr>
+    </thead>
+    <tr>
+      <td><label for="patient-mrn">MRN</label></td>
+      <td><input type="text" id="patient-mrn" name="patient-mrn" value="<%=@patientID%>"></td>
+    </tr>
+    <tr>
+      <td><label for="patient-name">Name</label></td>
+      <td><input type="text" id="patient-name" name="patient-name" value="<%=@patientName%>"></td>
+    </tr>
+    <tr>
+      <td><label for="patient-dob">DOB</label></td>
+      <td><input type="text" id="patient-dob" name="patient-dob" value="<%=@patientDOB%>"></td>
+    </tr>
+    <tr>
+      <td><label for="patient-sex">Sex</label></td>
+      <td><input type="text" id="patient-sex" name="patient-sex" value="<%=@patientSex%>"></td>
+    </tr>
+    <thead>
+      <tr><th colspan="2">Exam Info</th></tr>
+    </thead>
+    <tr>
+      <td><label for="exam-accession">Accession</label></td>
+      <td><input type="text" id="exam-accession" name="exam-accession" value="<%=@accession%>"></td>
+    </tr>
+    <tr>
+      <td><label for="exam-code">Code</label></td>
+      <td><input type="text" id="exam-code" name="exam-code" value="<%=@examCode%>"></td>
+    </tr>
+    <tr>
+      <td><label for="exam-description">Description</label></td>
+      <td><input type="text" id="exam-description" name="exam-description" value="<%=@examDescription%>"></td>
+    </tr>
+    <thead>
+      <tr><th colspan="2">Radiologist Info</th></tr>
+    </thead>
+    <tr>
+      <td><label for="attending">Attending</label></td>
+      <td><input type="text" id="attending" name="attending" value="<%=@attending%>"></td>
+    </tr>
+    <tr>
+      <td><label for="resident">Resident</label></td>
+      <td><input type="text" id="resident" name="resident" value="<%=@resident%>"></td>
+    </tr>
+    <thead>
+      <tr><th colspan="2">Referral Info</th></tr>
+    </thead>
+    <tr>
+      <td><label for="diag">Diagnosis</label></td>
+      <td><input type="text" id="diag" name="diag" value="<%=@diag%>"></td>
+    </tr>
+    <tr>
+      <td><label for="referring">Referring</label></td>
+      <td><input type="text" id="referring" name="referring" value="<%=@referring%>"></td>
+    </tr>
+  </table>
+  <div class="text-center">
+    <button class="btn btn-sm btn-primary" id="radsearch-advanced-button" type="submit">Go!</button>
+    <button class="btn btn-sm btn-danger" id="radsearch-clear-advanced">Clear Advanced Options</button>	
+  </div>
+  </form>
+</div>
+<script>
+  //Datepicker functions
+  $(function() {
+    $( "#rs-from" ).datepicker({
+      dateFormat: "yy-mm-dd",
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "2000:c",
+      numberOfMonths: 2,
+      onClose: function( selectedDate ) {
+        $( "#rs-to" ).datepicker( "option", "minDate", selectedDate );
+      }
+    });
+    $( "#rs-to" ).datepicker({
+      dateFormat: "yy-mm-dd",
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "2000:c",
+      numberOfMonths: 2,
+      onClose: function( selectedDate ) {
+        $( "#rs-from" ).datepicker( "option", "maxDate", selectedDate );
+      }
+    });
+    $( "#patient-dob" ).datepicker({
+      dateFormat: "yy-mm-dd",
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "1900:c",
+      numberOfMonths: 2
+    });
+  });
+
+  //On submit, get all the data and post it
+  function submitRadsearch(page) {
+    var phrase = $("#phrase").val();
+    var lower = $("#rs-from").val();
+    var upper = $("#rs-to").val();
+    var patientID = $('#patient-mrn').val();
+    var patientName = $('#patient-name').val();
+    var patientDOB = $('#patient-dob').val();
+    var patientSex = $('#patient-sex').val();
+    var accession = $('#exam-accession').val();
+    var examCode = $('#exam-code').val();
+    var examDescription = $('#exam-description').val();
+    var attending = $('#attending').val();
+    var resident = $('#resident').val();
+    var diag = $('#diag').val();
+    var referring = $('#referring').val();
+    var advancedVisible;
+    if($('#radsearch-side').is(':visible'))
+      advancedVisible = 'true';
+    else
+      advancedVisible = 'false';
+      
+    $("#radsearchhtml").html("Loading...");
+    $.post("/radsearch/radsearch", {
+    				   phrase: phrase,
+    				   page: page,
+				   advancedVisible: advancedVisible,
+				   lower: lower,
+				   upper: upper,
+				   patientID: patientID,
+				   patientName: patientName,
+				   patientDOB: patientDOB,
+				   patientSex: patientSex,
+				   accession: accession,
+				   examCode: examCode,
+				   examDescription: examDescription,
+				   attending: attending,
+				   resident: resident,
+				   diag: diag,
+				   referring: referring
+				   }, function(data) {
+      $("#radsearchhtml").html(data);
+    });
+  }
+
+  <!-- Various button handlers -->
+  $("#radsearch-button").click(function() {
+    submitRadsearch(1);
+    return false;
+  });
+
+  $("#radsearch-advanced-button").click(function() {
+    submitRadsearch(1);
+    return false;
+  });
+
+  $("#radsearch-clear-advanced").click(function() {
+    $('table input').val('');
+    return false;
+  });
+
+  $("#radsearch-advanced").click(function() {
+    if($('#radsearch-side').is(':visible')){
+      $('#radsearch-side').hide();
+      $('#radsearch-main').toggleClass('col-md-9 col-md-12');
+    }
+    else {
+      $('#radsearch-side').show();
+      $('#radsearch-main').toggleClass('col-md-12 col-md-9');    
+    }  
+    return false;
+  });
+
+  <!-- If the user views a report, log it by posting the data -->
+  $(".search-link").click(function(event){
+    var target = $(event.target);
+    if(target.attr('viewed')=='false'){
+      var sid = target.attr('search-id');
+      var mrn = target.attr('search-mrn');
+      var acc = target.attr('search-acc');
+
+      $.post("/radsearch/radsearch-log", {search_id: sid, mrn: mrn, acc: acc}, function(data) {
+        target.attr('viewed','true');
+      });
+    }
+  });
+
+  <!-- Pagination events -->
+  $(".pglink").click(function(event){
+    if($(event.target).hasClass("disabled"))
+      return false;
+    if($(event.target).hasClass("active"))
+      return false;
+
+    var page = $(event.target).attr('page');
+    submitRadsearch(page);
+
+    return false;
+  });
+</script>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Radsearch 2</title>
+
+    <link href="public/jquery-ui.css" rel="stylesheet">
+    <link href="public/bootstrap.min.css" rel="stylesheet">
+    <link href="public/grid.css" rel="stylesheet">
+    <link href="public/radsearch.css" rel="stylesheet">
+
+    <script src="public/jquery.js"></script>
+    <script src="public/jquery-ui.js"></script>
+    <script src="public/jquery-validate.js"></script>
+    <script src="public/bootstrap.min.js"></script>
+
+    <!--[if lt IE 9]>
+      <script src="public/html5shiv.min.js"></script>
+      <script src="public/respond.min.js"></script>
+    <![endif]-->
+
+    <script>
+      $.ajaxSetup ({
+        // Disable caching of AJAX responses
+        cache: false
+      });
+
+      <% if session[:username] %>
+        //set an idle timer to log people out if idle
+        var idleTime = 1;
+        var maxTime = 10;
+        $(document).ready(function () {
+          var idleInterval = setInterval(timerIncrement, 60000); // 1 minute
+
+          $(this).mousemove(function (e) {
+            idleTime = 0;
+          });
+          $(this).keypress(function (e) {
+            idleTime = 0;
+          });
+        });
+      
+        function timerIncrement() {
+          idleTime = idleTime + 1;
+          if (idleTime > maxTime) {
+            window.location = "/radsearch/login";
+          }
+        }
+      <% end %>
+
+      //for those times when the server side throws an unauthorized status code (i.e. server side timeout)
+      $(document).ajaxError(function(event, request, settings) {
+        if(request.status==401){
+          window.location = "/radsearch/login";
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <button type="button" class="btn btn-default" style="float:right" onclick="window.location.replace('/radsearch/login');">Logout</button>
+      <h2>Radsearch</h2>
+      <div id="radsearchhtml">
+	<%= yield %>
+      </div>
+    </div>
+  </body>
+</html>

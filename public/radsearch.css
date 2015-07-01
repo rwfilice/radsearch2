@@ -1,0 +1,24 @@
+kbd {
+    background-color: #5AB55C;
+    webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.radsearch-col {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+}
+
+#radsearch-main {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+}
+
+#radsearch-side {
+    border: none;
+    background: none;
+}
