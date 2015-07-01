@@ -4,7 +4,7 @@ Updated version of Radsearch - with thanks and credit to the original Radsearch 
 # Things you'll need
 
 ## Web Application
-1. A server to host - I use Apache on Ubuntu Server 14.04
+1. A server to host - I use Apache on Ubuntu Server 14.04 but only to proxypass to Passenger (see #4)
 2. Ruby - I use version 2.1.5
 3. The right ruby gems: sinatra, ldap, mysql, json, chronic, net/http
 4. Something to run a Ruby/Sinatra application - I use [Passenger Standalone](https://www.phusionpassenger.com/documentation/Users%20guide%20Standalone.html)
