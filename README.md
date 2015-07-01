@@ -29,7 +29,5 @@ You'll need to create db-data-config.xml (at least that's what my config file is
 ## Database connector
 In solrconfig.xml I had to include this jar file to allow access to MySQL
 
->`<lib dir="${solr.install.dir:../../../..}/contrib/dataimporthandler/lib" rege\
-x=".*\.jar" /\>`<br>
->`<lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-dataimporthandle\
-r-\d.*\.jar" />`
+>`<lib dir="${solr.install.dir:../../../..}/contrib/dataimporthandler/lib" regex=".*\.jar" />`<br>
+>`<lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-dataimporthandler-\d.*\.jar" />`
