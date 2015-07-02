@@ -1,5 +1,5 @@
 # radsearch2
-New version of Radsearch written from the ground up and using new indexing technology. Thanks and conceptual credit to the original Radsearch team from the University of Maryland (Chris Meenan, [Max Warnock](https://github.com/mwarnock), [Mark Daly](https://github.com/markdaly), [Christopher Toland](https://github.com/ctoland)) and Indiana University ([Marc Kohli, M.D.](https://github.com/shadowdoc)).
+New version of Radsearch written from the ground up and using new indexing technology. Thanks and conceptual credit to the original Radsearch team from the University of Maryland ([Mark Daly](https://github.com/markdaly), Wayne LaBelle, Chris Meenan, [Christopher Toland](https://github.com/ctoland), [Max Warnock](https://github.com/mwarnock)) and Indiana University ([Marc Kohli, M.D.](https://github.com/shadowdoc)).
 
 # Things you'll need
 
