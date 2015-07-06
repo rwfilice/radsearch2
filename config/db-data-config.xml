@@ -1,0 +1,14 @@
+<dataConfig>
+  <dataSource type="JdbcDataSource"
+            driver="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://172.19.2.209:3306/[MYSQL DATABASE]"
+	    batchSize="-1"
+            user="[MYSQL USER]"
+            password="[MYSQL PASSWORD]" />
+  <document>
+    <entity name="reports" pk="id"
+	    query="select id, patient_id, patient_name, patient_dob, patient_sex, accession_number, diag, procedure_name, procedure_id, requesting, assisting, assisting_id, attending, attending_id, CONVERT_TZ(timestamp,@@session.time_zone,'+00:00') as timestamp, CONVERT_TZ(date,@@session.time_zone,'+00:00') as date, CONVERT_TZ(examtime,@@session.time_zone,'+00:00') as examtime, CONVERT_TZ(examdate,@@session.time_zone,'+00:00') as examdate, report from reports;"
+            deltaImportQuery="select id, patient_id, patient_name, patient_dob, patient_sex, accession_number, diag, procedure_name, procedure_id, requesting, assisting, assisting_id, attending, attending_id, CONVERT_TZ(timestamp,@@session.time_zone,'+00:00') as timestamp, CONVERT_TZ(date,@@session.time_zone,'+00:00') as date, CONVERT_TZ(examtime,@@session.time_zone,'+00:00') as examtime, CONVERT_TZ(examdate,@@session.time_zone,'+00:00') as examdate, report from reports where id='${dih.delta.id}'"
+            deltaQuery="select id from reports where timestampdiff(minute,CONVERT_TZ('${dih.last_index_time}','+00:00',@@session.time_zone),modified)>-10"/>
+  </document>
+</dataConfig>
