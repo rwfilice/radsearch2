@@ -23,10 +23,12 @@ New version of Radsearch written from the ground up and using new indexing techn
 
 # Solr config
 
-## Database config
+## Database config (see example in config directory)
 You'll need to create db-data-config.xml (at least that's what my config file is called) that establishes a query, a deltaQuery, and a deltaImportQuery. The query and deltaImportQuery should pull all the data you want to be indexed. The deltaQuery should identify those reports that have been updated since the last index - I do this by comparing a modified timestamp from our reports MySQL database to the Solr variable ${dih.last_index_time}. You also need to provide MySQL authentication information in this file. In my case (using Solr on a separate VM) I had to be sure to allow my MySQL server to allow access from that VM IP.
 
-## Database connector
+You'll also need to modify the managed-schema file - this identifies the fields you want indexed and stored, and how you want them indexed. See example in config directory.
+
+## Database connector (see example in config directory)
 In solrconfig.xml I had to include this jar file to allow access to MySQL
 
 >`<lib dir="${solr.install.dir:../../../..}/contrib/dataimporthandler/lib" regex=".*\.jar" />`<br>
